@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrderDesk - Namecheap Shared Hosting Deployment Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #ffc500, #ff8c00);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc500;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .info {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border-left: 4px solid #ffc500;
+        }
+        .step {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .step h3 {
+            color: #ffc500;
+            margin-top: 0;
+            border-bottom: 2px solid #ffc500;
+            padding-bottom: 10px;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .checklist li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .file-tree {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ffc500;
+        }
+        .important {
+            background: #fff;
+            border: 2px solid #ffc500;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 OrderDesk Deployment Guide</h1>
+        <p>Complete guide for deploying to Namecheap Shared Hosting</p>
+    </div>
+
+    <div class="important">
+        <h2>🎯 Quick Start Summary</h2>
+        <p><strong>Total Time:</strong> 15-30 minutes | <strong>Difficulty:</strong> Beginner-friendly</p>
+        <p>This guide will help you deploy OrderDesk to your Namecheap shared hosting account with MySQL database support.</p>
+    </div>
+
+    <div class="step">
+        <h3>📋 Prerequisites Check</h3>
+        <ul class="checklist">
+            <li>Namecheap shared hosting account (Stellar, Stellar Plus, or Stellar Business)</li>
+            <li>cPanel access credentials</li>
+            <li>Domain name pointed to your hosting</li>
+            <li>FTP/SFTP client or cPanel File Manager access</li>
+        </ul>
+        
+        <div class="info">
+            <strong>💡 Hosting Requirements:</strong>
+            <ul>
+                <li>PHP 7.4 or higher (PHP 8.x recommended)</li>
+                <li>MySQL 5.7 or higher</li>
+                <li>GD extension for image processing</li>
+                <li>PDO MySQL extension</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>🗄️ Step 1: Database Setup</h3>
+        
+        <h4>Creating Database in cPanel:</h4>
+        <ol>
+            <li>Log into your Namecheap cPanel</li>
+            <li>Navigate to <strong>"MySQL Databases"</strong> section</li>
+            <li>Create a new database:
+                <pre>Database Name: orderdesk_main</pre>
+            </li>
+            <li>Create a database user:
+                <pre>Username: orderdesk_user
+Password: [Generate strong password]</pre>
+            </li>
+            <li>Add user to database with <strong>ALL PRIVILEGES</strong></li>
+            <li>Note down these details for later configuration</li>
+        </ol>
+
+        <h4>Importing Database Schema:</h4>
+        <ol>
+            <li>In cPanel, open <strong>phpMyAdmin</strong></li>
+            <li>Select your newly created database</li>
+            <li>Click <strong>"Import"</strong> tab</li>
+            <li>Upload the <code>database.sql</code> file (MySQL version)</li>
+            <li>Click <strong>"Go"</strong> to import</li>
+        </ol>
+
+        <div class="warning">
+            <strong>⚠️ Important:</strong> Use the MySQL-compatible schema. The system is designed to work with both PostgreSQL (Replit) and MySQL (shared hosting).
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>📁 Step 2: File Upload & Structure</h3>
+        
+        <h4>Download Files from Replit:</h4>
+        <ol>
+            <li>In your Replit workspace, click the <strong>three dots menu</strong></li>
+            <li>Select <strong>"Download as zip"</strong></li>
+            <li>Extract the zip file on your computer</li>
+        </ol>
+
+        <h4>Upload to Namecheap Hosting:</h4>
+        <ol>
+            <li>Access cPanel File Manager or use FTP client</li>
+            <li>Navigate to <code>public_html</code> directory</li>
+            <li>Upload all files maintaining this structure:</li>
+        </ol>
+
+        <div class="file-tree">
+public_html/
+├── css/
+│   └── style.css
+├── js/
+│   └── script.js
+├── uploads/
+│   └── screenshots/
+├── config.php
+├── index.php
+├── login.php
+├── dashboard_admin.php
+├── manage_orders.php
+├── store_analytics.php
+└── [all other PHP files]
+        </div>
+
+        <h4>Set Directory Permissions:</h4>
+        <ol>
+            <li>Right-click on <code>uploads</code> folder</li>
+            <li>Select <strong>"Change Permissions"</strong></li>
+            <li>Set to <strong>755</strong> or <strong>777</strong> (if 755 doesn't work)</li>
+            <li>Apply to all subdirectories</li>
+        </ol>
+    </div>
+
+    <div class="step">
+        <h3>⚙️ Step 3: Configuration Setup</h3>
+        
+        <h4>Edit config.php:</h4>
+        <ol>
+            <li>Open <code>config.php</code> in File Manager editor</li>
+            <li>Update database configuration:</li>
+        </ol>
+
+        <pre>
+// Namecheap Database Configuration
+$host = 'localhost';  // Always localhost for Namecheap
+$dbname = 'cpanel_username_orderdesk_main';  // Format: cpanel_username_databasename
+$username = 'cpanel_username_orderdesk_user'; // Format: cpanel_username_dbusername
+$password = 'your_database_password';
+
+// MySQL Connection (updated from PostgreSQL)
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]);
+} catch(PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+        </pre>
+
+        <div class="warning">
+            <strong>🔍 Finding Your Database Details:</strong>
+            <ul>
+                <li><strong>Host:</strong> Usually <code>localhost</code> for Namecheap</li>
+                <li><strong>Database Name:</strong> Check in cPanel MySQL Databases section</li>
+                <li><strong>Username:</strong> Usually prefixed with your cPanel username</li>
+                <li><strong>Password:</strong> The one you set during database user creation</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>🛡️ Step 4: Security Configuration</h3>
+        
+        <h4>Create .htaccess file:</h4>
+        <p>Create a <code>.htaccess</code> file in your <code>public_html</code> directory:</p>
+        
+        <pre>
+# OrderDesk Security Configuration
+RewriteEngine On
+
+# Force HTTPS (if SSL is available)
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Protect sensitive files
+&lt;Files "config.php"&gt;
+    Order allow,deny
+    Deny from all
+&lt;/Files&gt;
+
+# Prevent directory browsing
+Options -Indexes
+
+# Protect uploads directory from direct access to PHP files
+&lt;Directory "uploads"&gt;
+    &lt;Files "*.php"&gt;
+        Order allow,deny
+        Deny from all
+    &lt;/Files&gt;
+&lt;/Directory&gt;
+        </pre>
+
+        <h4>Change Default Credentials:</h4>
+        <ol>
+            <li>Access your site: <code>https://yourdomain.com</code></li>
+            <li>Login with default credentials</li>
+            <li>Immediately change admin password</li>
+            <li>Create new admin users and disable defaults</li>
+        </ol>
+    </div>
+
+    <div class="step">
+        <h3>🧪 Step 5: Testing & Verification</h3>
+        
+        <ul class="checklist">
+            <li>Visit your domain to check homepage loads</li>
+            <li>Test login functionality with admin credentials</li>
+            <li>Upload a test order CSV file</li>
+            <li>Try uploading a screenshot</li>
+            <li>Check analytics page for data visualization</li>
+            <li>Test agent management features</li>
+            <li>Verify email notifications (if configured)</li>
+        </ul>
+
+        <div class="success">
+            <strong>✅ Success Indicators:</strong>
+            <ul>
+                <li>Homepage displays with yellow/black theme</li>
+                <li>Login redirects to appropriate dashboard</li>
+                <li>Database connections working (no errors)</li>
+                <li>File uploads function properly</li>
+                <li>Charts and analytics display data</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>🔧 Troubleshooting Common Issues</h3>
+        
+        <h4>Database Connection Errors:</h4>
+        <ul>
+            <li><strong>Error:</strong> "Database connection failed"
+                <br><strong>Solution:</strong> Double-check database credentials in config.php</li>
+            <li><strong>Error:</strong> "Access denied for user"
+                <br><strong>Solution:</strong> Verify database user has proper privileges</li>
+        </ul>
+
+        <h4>File Upload Issues:</h4>
+        <ul>
+            <li><strong>Error:</strong> "Failed to upload file"
+                <br><strong>Solution:</strong> Check uploads directory permissions (set to 755 or 777)</li>
+            <li><strong>Error:</strong> "File too large"
+                <br><strong>Solution:</strong> Check PHP upload limits in cPanel PHP settings</li>
+        </ul>
+
+        <h4>PHP Errors:</h4>
+        <ul>
+            <li><strong>Error:</strong> "Call to undefined function"
+                <br><strong>Solution:</strong> Check PHP extensions in cPanel PHP Selector</li>
+            <li><strong>Error:</strong> "Session errors"
+                <br><strong>Solution:</strong> Verify session.save_path is writable</li>
+        </ul>
+
+        <div class="info">
+            <strong>📞 Getting Help:</strong>
+            <ul>
+                <li><strong>Namecheap Support:</strong> Available 24/7 via live chat</li>
+                <li><strong>Error Logs:</strong> Check cPanel Error Logs for detailed errors</li>
+                <li><strong>PHP Info:</strong> Create phpinfo.php file to check server configuration</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>🚀 Step 6: Going Live</h3>
+        
+        <h4>Final Checklist:</h4>
+        <ul class="checklist">
+            <li>SSL certificate installed and working</li>
+            <li>All default passwords changed</li>
+            <li>File permissions properly set</li>
+            <li>Database backups configured</li>
+            <li>Error reporting disabled in production</li>
+            <li>Regular backup schedule established</li>
+        </ul>
+
+        <h4>Performance Optimization:</h4>
+        <ol>
+            <li>Enable <strong>gzip compression</strong> in cPanel</li>
+            <li>Set up <strong>caching</strong> if available</li>
+            <li>Optimize <strong>images</strong> (automatically handled by OrderDesk)</li>
+            <li>Monitor <strong>resource usage</strong> in cPanel</li>
+        </ol>
+    </div>
+
+    <div class="important">
+        <h2>🎉 Congratulations!</h2>
+        <p>Your OrderDesk system is now live on Namecheap shared hosting! The system includes:</p>
+        <ul>
+            <li>✅ Professional yellow/black theme</li>
+            <li>✅ Complete order management</li>
+            <li>✅ Agent assignment system</li>
+            <li>✅ Analytics dashboard with charts</li>
+            <li>✅ Automatic image compression</li>
+            <li>✅ PostgreSQL to MySQL compatibility</li>
+        </ul>
+        <p><strong>Next Steps:</strong> Start adding your stores, agents, and importing orders to begin managing your eCommerce operations!</p>
+    </div>
+
+    <div class="warning">
+        <strong>📝 Remember:</strong> Keep your database credentials secure and create regular backups of both files and database through cPanel backup tools.
+    </div>
+</body>
+</html>
